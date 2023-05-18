@@ -62,7 +62,6 @@ void NDL_OpenCanvas(int *w, int *h)
 
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h)
 {
-    int fd = open("/dev/fb", 0, 0);
     int canvas_offx = (screen_w - canvas_w) / 2;
     int canvas_offy = (screen_h - canvas_h) / 2;
     int rect_offx = canvas_offx + x;
@@ -70,17 +69,16 @@ void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h)
 #ifdef __ISA_NATIVE__
     for (int i = 0; i < h; i++)
     {
-        lseek(fd, ((rect_offy + i) * screen_w + rect_offx) * 4, SEEK_SET);
-        write(fd, pixels + i * w, w * 4);
+        lseek(fbdev, ((rect_offy + i) * screen_w + rect_offx) * sizeof(uint32_t), SEEK_SET);
+        write(fbdev, pixels + i * w, w * sizeof(uint32_t));
     }
 #else
-    lseek(fd, (rect_offy * screen_w + rect_offx) * 4, SEEK_SET);
+    lseek(fbdev, (rect_offy * screen_w + rect_offx) * sizeof(uint32_t), SEEK_SET);
     size_t size = w; // size is {32'w, 32'h}
     size <<= 32;
     size += h;
-    write(fd, pixels, size);
+    write(fbdev, pixels, size);
 #endif
-    close(fd);
 }
 
 void NDL_OpenAudio(int freq, int channels, int samples)
