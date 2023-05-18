@@ -63,16 +63,16 @@ void NDL_OpenCanvas(int *w, int *h)
 void NDL_DrawRect(uint32_t *pixels, int x, int y, int w, int h)
 {
     int fd = open("/dev/fb", 0, 0);
+    int screen_x = (screen_w - w) / 2;
+    int screen_y = (screen_h - h) / 2;
 #ifdef __ISA_NATIVE__
     for (int i = 0; i < h; i++)
     {
-        lseek(fd, (y + i) * screen_w + x, SEEK_SET);
-        write(fd, pixels, w);
+        lseek(fd, ((screen_y + i) * screen_w + screen_x) * 4, SEEK_SET);
+        write(fd, pixels + i * w, w * 4);
     }
 #else
-    int screen_x = (screen_w - w) / 2;
-    int screen_y = (screen_h - h) / 2;
-    lseek(fd, screen_y * screen_w + screen_x, SEEK_SET);
+    lseek(fd, (screen_y * screen_w + screen_x) * 4, SEEK_SET);
     size_t size = w; // size is {32'w, 32'h}
     size <<= 32;
     size += h;
