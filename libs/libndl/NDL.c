@@ -21,9 +21,7 @@ uint32_t NDL_GetTicks()
 
 int NDL_PollEvent(char *buf, int len)
 {
-    int fd = open("/dev/events", 0, 0);
-    int ret = read(fd, buf, len);
-    close(fd);
+    int ret = read(evtdev, buf, len);
     return ret ? 1 : 0;
 }
 
@@ -101,15 +99,18 @@ int NDL_QueryAudio()
 
 int NDL_Init(uint32_t flags)
 {
+    int dispinfo = open("/proc/dispinfo", 0, 0);
+    char info[64];
+    read(dispinfo, info, 64);
+    close(dispinfo);
+    sscanf(info, "WIDTH %*[: ]%d\nHEIGHT %*[: ]%d", &screen_w, &screen_h);
+
+    fbdev = open("/dev/fb", 0, 0);
+    evtdev = open("/dev/events", 0, 0);
     if (getenv("NWM_APP"))
     {
         evtdev = 3;
     }
-    int fd = open("/proc/dispinfo", 0, 0);
-    char info[64];
-    read(fd, info, 64);
-    close(fd);
-    sscanf(info, "WIDTH %*[: ]%d\nHEIGHT %*[: ]%d", &screen_w, &screen_h);
     return 0;
 }
 
@@ -117,4 +118,6 @@ void NDL_Quit()
 {
     canvas_w = 0;
     canvas_h = 0;
+    close(fbdev);
+    close(evtdev);
 }
