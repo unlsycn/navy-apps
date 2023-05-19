@@ -1,16 +1,14 @@
-#include <NDL.h>
+#include <SDL.h>
 #include <stdint.h>
 #include <stdio.h>
 
 int main()
 {
-    NDL_Init(0);
-    uint32_t now, last;
+    SDL_Init(0);
     while (1)
-        if (now = NDL_GetTicks(), now - last >= 500)
-        {
-            last = now;
-            printf("ms = %u\n", now);
-        }
+    {
+        SDL_Delay(500);
+        printf("ms\n");
+    }
     return 0;
 }
