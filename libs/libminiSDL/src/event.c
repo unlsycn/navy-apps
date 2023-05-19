@@ -31,17 +31,21 @@ int SDL_PushEvent(SDL_Event *ev)
     return 0;
 }
 
-int SDL_PollEvent(SDL_Event *ev) {
-  return 0;
+int SDL_PollEvent(SDL_Event *ev)
+{
+    const int len = 32;
+    char nevent[len];
+    int ret = NDL_PollEvent(nevent, len);
+    if (ret)
+        *ev = (SDL_Event)SDL_ParseNDLEvent(nevent);
+    return ret;
 }
 
-int SDL_WaitEvent(SDL_Event *event) {
-  const int len = 32;
-  char nevent[len];
-  while (NDL_PollEvent(nevent, len) == 0)
+int SDL_WaitEvent(SDL_Event *ev)
+{
+    while (SDL_PollEvent(ev) == 0)
         ;
-  *event = (SDL_Event)SDL_ParseNDLEvent(nevent);
-  return 1;
+    return 1;
 }
 
 int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
