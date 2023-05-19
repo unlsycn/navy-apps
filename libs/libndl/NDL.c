@@ -12,11 +12,13 @@ static int fbdev = -1;
 static int screen_w = 0, screen_h = 0;
 static int canvas_w = 0, canvas_h = 0;
 
+static struct timeval begin_time;
+
 uint32_t NDL_GetTicks()
 {
     struct timeval now;
     gettimeofday(&now, NULL);
-    return now.tv_sec * 10 + now.tv_usec / 1000;
+    return (now.tv_sec - begin_time.tv_sec) * 1000 + (now.tv_usec - begin_time.tv_usec) / 1000;
 }
 
 int NDL_PollEvent(char *buf, int len)
@@ -111,6 +113,9 @@ int NDL_Init(uint32_t flags)
     {
         evtdev = 3;
     }
+
+    gettimeofday(&begin_time, NULL);
+
     return 0;
 }
 
