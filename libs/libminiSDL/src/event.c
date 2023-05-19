@@ -1,11 +1,14 @@
+#include "debug.h"
 #include <NDL.h>
 #include <SDL.h>
 #include <assert.h>
 #include <string.h>
 
 #define keyname(k) #k,
+#define keystate(k) 0,
 
 static const char *keyname[] = {"NONE", _KEYS(keyname)};
+static uint8_t keystate[] = {0, _KEYS(keystate)};
 
 SDL_KeyboardEvent SDL_ParseNDLEvent(const char *nevent)
 {
@@ -21,7 +24,10 @@ SDL_KeyboardEvent SDL_ParseNDLEvent(const char *nevent)
     for (int i = 0; i < (int)(sizeof(keyname) / sizeof(const char *)); i++)
     {
         if (strcmp(key, keyname[i]) == 0)
+        {
             event.keysym.sym = i;
+            keystate[i] = event.type == SDL_KEYDOWN ? 1 : 0;
+        }
     }
     return event;
 }
@@ -49,9 +55,11 @@ int SDL_WaitEvent(SDL_Event *ev)
 }
 
 int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
-  return 0;
+    panic("Not implement");
+    return 0;
 }
 
-uint8_t* SDL_GetKeyState(int *numkeys) {
-  return NULL;
+uint8_t *SDL_GetKeyState(int *numkeys)
+{
+    return keystate;
 }
