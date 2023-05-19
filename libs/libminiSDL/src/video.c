@@ -1,3 +1,4 @@
+#include "debug.h"
 #include <NDL.h>
 #include <assert.h>
 #include <sdl-video.h>
@@ -28,9 +29,12 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
     {
         dst_x = dstrect->x;
         dst_y = dstrect->y;
+        dstrect->w = w;
+        dstrect->h = h;
     }
 
-    assert(dst->format->BytesPerPixel == 4);
+    uint8_t pixel_size = dst->format->BytesPerPixel;
+    assert(pixel_size == 1 || pixel_size == 4);
     for (int i = 0; i < h; i++)
     {
         int dst_y_off = (dst_y + i) * dst->w;
@@ -39,14 +43,12 @@ void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_
         {
             int dst_x_off = dst_x + j;
             int src_x_off = src_x + j;
-            ((uint32_t *)dst->pixels)[dst_y_off + dst_x_off] = ((uint32_t *)src->pixels)[src_y_off + src_x_off];
+            if (pixel_size == 4)
+                ((uint32_t *)dst->pixels)[dst_y_off + dst_x_off] = ((uint32_t *)src->pixels)[src_y_off + src_x_off];
+            else
+                dst->pixels[dst_y_off + dst_x_off] = src->pixels[src_y_off + src_x_off];
         }
     }
-
-    dstrect->x = dst_x;
-    dstrect->y = dst_y;
-    dstrect->w = w;
-    dstrect->h = h;
 }
 
 void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color)
@@ -55,7 +57,8 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color)
 
     if (dstrect == NULL)
     {
-        NDL_OpenCanvas(&w, &h);
+        w = dst->w;
+        h = dst->h;
     }
     else
     {
@@ -65,14 +68,18 @@ void SDL_FillRect(SDL_Surface *dst, SDL_Rect *dstrect, uint32_t color)
         h = dstrect->h;
     }
 
-    assert(dst->format->BytesPerPixel == 4);
+    uint8_t pixel_size = dst->format->BytesPerPixel;
+    assert(pixel_size == 1 || pixel_size == 4);
     for (int i = 0; i < h; i++)
     {
         int y_off = (y + i) * dst->w;
         for (int j = 0; j < w; j++)
         {
             int x_off = x + j;
-            ((uint32_t *)dst->pixels)[y_off + x_off] = color;
+            if (pixel_size == 4)
+                ((uint32_t *)dst->pixels)[y_off + x_off] = color;
+            else
+                dst->pixels[y_off + x_off] = (uint8_t)color;
         }
     }
 }
@@ -85,14 +92,26 @@ void SDL_UpdateRect(SDL_Surface *s, int x, int y, int w, int h)
         h = s->h;
     }
 
-    switch (s->format->BytesPerPixel)
+    uint8_t pixel_size = s->format->BytesPerPixel;
+    assert(pixel_size == 1 || pixel_size == 4);
+    if (pixel_size == 4)
     {
-    case 4:
         assert(s->format->Amask == DEFAULT_AMASK);
         NDL_DrawRect((uint32_t *)s->pixels, x, y, w, h);
-        break;
-    default:
-        assert(0);
+    }
+    else
+    {
+        SDL_Color *colors = s->format->palette->colors;
+        uint32_t *pixels = malloc(w * h * sizeof(uint32_t));
+        for (int i = 0; i < h; i++)
+            for (int j = 0; j < w; j++)
+            {
+                uint8_t r = colors[i * w + j].r;
+                uint8_t g = colors[i * w + j].g;
+                uint8_t b = colors[i * w + j].b;
+                pixels[w * i + j] = (r << 16) | (g << 8) | b;
+            }
+        NDL_DrawRect(pixels, x, y, w, h);
     }
 }
 
@@ -327,9 +346,11 @@ uint32_t SDL_MapRGBA(SDL_PixelFormat *fmt, uint8_t r, uint8_t g, uint8_t b, uint
 
 int SDL_LockSurface(SDL_Surface *s)
 {
+    panic("Not implement");
     return 0;
 }
 
 void SDL_UnlockSurface(SDL_Surface *s)
 {
+    panic("Not implement");
 }
