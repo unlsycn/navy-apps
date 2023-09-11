@@ -15,7 +15,7 @@ CFLAGS += -I$(WORK_DIR)/include/native/
 else
 CFLAGS += -I$(WORK_DIR)/include/navy/ -D__GLIBC__ -fdata-sections -ffunction-sections -nostdlib
 comma = ,
-LDFLAGS := $(addprefix -Wl$(comma), $(LDFLAGS))
+LDFLAGS := $(addprefix -Wl$(comma), --no-relax --Ttext-segment $(LNK_ADDR))
 export LDFLAGS
 export LINKAGE
 endif

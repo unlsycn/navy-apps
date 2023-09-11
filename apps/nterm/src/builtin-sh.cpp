@@ -1,7 +1,7 @@
+#include <SDL.h>
 #include <nterm.h>
 #include <stdarg.h>
 #include <unistd.h>
-#include <SDL.h>
 
 char handle_key(SDL_Event *ev);
 
@@ -23,6 +23,22 @@ static void sh_prompt() {
 }
 
 static void sh_handle_cmd(const char *cmd) {
+#define MAX_TK 128
+  char *tokens[MAX_TK];
+
+  int tk_cnt = 0;
+  char *token = strtok((char *)cmd, " ");
+  while (token != NULL)
+  {
+      tokens[tk_cnt++] = token;
+      token = strtok(NULL, " ");
+  }
+  assert(tk_cnt < MAX_TK);
+  tokens[tk_cnt - 1][strlen(tokens[tk_cnt - 1]) - 1] = '\0'; // remove the last \n
+  tokens[tk_cnt] = NULL;
+
+  char *envp[] = {NULL};
+  execve(tokens[0], tokens, envp);
 }
 
 void builtin_sh_run() {
