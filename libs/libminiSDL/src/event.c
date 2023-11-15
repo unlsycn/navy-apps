@@ -1,8 +1,9 @@
-#include "debug.h"
 #include <NDL.h>
 #include <SDL.h>
 #include <assert.h>
 #include <string.h>
+
+#include "debug.h"
 
 #define keyname(k) #k,
 #define keystate(k) 0,
@@ -54,7 +55,8 @@ int SDL_WaitEvent(SDL_Event *ev)
     return 1;
 }
 
-int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask) {
+int SDL_PeepEvents(SDL_Event *ev, int numevents, int action, uint32_t mask)
+{
     panic("Not implement");
     return 0;
 }

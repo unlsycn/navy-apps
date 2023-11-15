@@ -1,11 +1,13 @@
-#include "debug.h"
 #include <NDL.h>
 #include <assert.h>
-#include <sdl-video.h>
 #include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+#include <sdl-video.h>
+
+#include "debug.h"
 
 void SDL_BlitSurface(SDL_Surface *src, SDL_Rect *srcrect, SDL_Surface *dst, SDL_Rect *dstrect)
 {
@@ -327,18 +329,18 @@ static void ConvertPixelsARGB_ABGR(void *dst, void *src, int len)
 
 SDL_Surface *SDL_ConvertSurface(SDL_Surface *src, SDL_PixelFormat *fmt, uint32_t flags)
 {
-      assert(src->format->BitsPerPixel == 32);
-      assert(src->w * src->format->BytesPerPixel == src->pitch);
-      assert(src->format->BitsPerPixel == fmt->BitsPerPixel);
+    assert(src->format->BitsPerPixel == 32);
+    assert(src->w * src->format->BytesPerPixel == src->pitch);
+    assert(src->format->BitsPerPixel == fmt->BitsPerPixel);
 
-      SDL_Surface *ret =
-          SDL_CreateRGBSurface(flags, src->w, src->h, fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
+    SDL_Surface *ret =
+        SDL_CreateRGBSurface(flags, src->w, src->h, fmt->BitsPerPixel, fmt->Rmask, fmt->Gmask, fmt->Bmask, fmt->Amask);
 
-      assert(fmt->Gmask == src->format->Gmask);
-      assert(fmt->Amask == 0 || src->format->Amask == 0 || (fmt->Amask == src->format->Amask));
-      ConvertPixelsARGB_ABGR(ret->pixels, src->pixels, src->w * src->h);
+    assert(fmt->Gmask == src->format->Gmask);
+    assert(fmt->Amask == 0 || src->format->Amask == 0 || (fmt->Amask == src->format->Amask));
+    ConvertPixelsARGB_ABGR(ret->pixels, src->pixels, src->w * src->h);
 
-      return ret;
+    return ret;
 }
 
 uint32_t SDL_MapRGBA(SDL_PixelFormat *fmt, uint8_t r, uint8_t g, uint8_t b, uint8_t a)

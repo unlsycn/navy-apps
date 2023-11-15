@@ -54,7 +54,7 @@ WL = -Wl,
 endif
 
 ### 32-bit ISA may need compiler-rt to support 64-bit mul/div
-ifneq ($(findstring $(ISA), x86|mips32|riscv32|loongarch32r),)
+ifneq ($(findstring $(ISA), x86|mips32|riscv32|riscv32e|loongarch32r),)
 LIBS += compiler-rt
 endif
 
@@ -77,7 +77,7 @@ LLVMFLAGS = $(if $(CROSS_COMPILE),--target=$(CROSS_COMPILE))
 AS        = $(CROSS_COMPILE)gcc
 CC        = $(CROSS_COMPILE)gcc
 CXX       = $(CROSS_COMPILE)g++
-LD        = mold
+LD        = $(CROSS_COMPILE)ld
 AR        = llvm-ar
 
 ### Compilation flags
