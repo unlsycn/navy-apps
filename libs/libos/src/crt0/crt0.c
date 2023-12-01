@@ -8,7 +8,7 @@ extern char **environ;
 void call_main(uintptr_t *args)
 {
     // argc
-    args = (uintptr_t *)((int *)args - 1);
+    args = (uintptr_t *)((uint64_t *)args - 1);
     int argc = *(int *)args;
     // argv
     char *argv[argc + 1];
