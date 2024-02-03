@@ -76,14 +76,12 @@ int _write(int fd, void *buf, size_t count)
     return _syscall_(SYS_write, fd, (intptr_t)buf, count);
 }
 
-char *heap_ptr;
+extern char _end[];
+static char *heap_ptr = (char *)&_end;
 void *_sbrk(intptr_t increment)
 {
-    extern char _end[];
-    if (!heap_ptr)
-        heap_ptr = (char *)&_end;
     char *old = heap_ptr;
-    intptr_t ret = _syscall_(SYS_brk, increment, 0, 0);
+    intptr_t ret = _syscall_(SYS_brk, (uintptr_t)heap_ptr + increment, 0, 0);
     if (ret == -1)
         return (void *)-1;
     heap_ptr += increment;
