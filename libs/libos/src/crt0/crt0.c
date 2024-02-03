@@ -1,6 +1,5 @@
 #include <assert.h>
 #include <stdint.h>
-#include <stdio.h>
 #include <stdlib.h>
 
 int main(int argc, char *argv[], char *envp[]);
@@ -8,7 +7,7 @@ extern char **environ;
 void call_main(uintptr_t *args)
 {
     // argc
-    args = (uintptr_t *)((uint64_t *)args - 1);
+    args = (uintptr_t *)(args - 1);
     int argc = *(int *)args;
     // argv
     char *argv[argc + 1];
